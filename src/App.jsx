@@ -386,32 +386,39 @@ export default function App() {
                 const x = leftMargin + col * colPitch;
                 const y = pageHeight - (topMargin + (row + 1) * rowPitch);
 
+                // 1. Centered Title
                 if (item.title) {
-                  const title = item.title.length > 32 ? item.title.slice(0, 32) + "..." : item.title;
+                  const title = item.title.length > 36 ? item.title.slice(0, 36) + "..." : item.title;
+                  const titleWidth = helveticaBold.widthOfTextAtSize(title, 7.5);
                   page.drawText(title, {
-                    x: x + 8,
-                    y: y + labelHeight - 14,
-                    size: 7.2,
+                    x: x + Math.max(4, (labelWidth - titleWidth) / 2),
+                    y: y + labelHeight - 13,
+                    size: 7.5,
                     font: helveticaBold,
                     color: rgb(0.1, 0.1, 0.1),
                   });
                 }
 
+                // 2. Centered Barcode
                 const embeddedPng = barcodeCache[item.sku];
                 if (embeddedPng) {
+                  const bcWidth = 150;
+                  const bcHeight = 42;
                   page.drawImage(embeddedPng, {
-                    x: x + (labelWidth - 146) / 2,
-                    y: y + 14,
-                    width: 146,
-                    height: 40,
+                    x: x + (labelWidth - bcWidth) / 2,
+                    y: y + 15,
+                    width: bcWidth,
+                    height: bcHeight,
                   });
                 }
 
+                // 3. Centered Condition
                 if (item.condition) {
+                  const condWidth = helvetica.widthOfTextAtSize(item.condition, 6.5);
                   page.drawText(item.condition, {
-                    x: x + 8,
+                    x: x + (labelWidth - condWidth) / 2,
                     y: y + 5,
-                    size: 6.2,
+                    size: 6.5,
                     font: helvetica,
                     color: rgb(0.3, 0.3, 0.3),
                   });
@@ -448,10 +455,12 @@ export default function App() {
                 const x = leftMargin + col * colPitch;
                 const y = pageHeight - (topMargin + (row + 1) * rowPitch);
 
+                // 1. Centered Big Box Title
                 if (item.title) {
                   const title = item.title.length > 40 ? item.title.slice(0, 40) + "..." : item.title;
+                  const titleWidth = helveticaBold.widthOfTextAtSize(title, 11);
                   page.drawText(title, {
-                    x: x + 16,
+                    x: x + Math.max(10, (labelWidth - titleWidth) / 2),
                     y: y + labelHeight - 24,
                     size: 11,
                     font: helveticaBold,
@@ -459,19 +468,24 @@ export default function App() {
                   });
                 }
 
+                // 2. Centered Barcode
                 const embeddedPng = barcodeCache[item.sku];
                 if (embeddedPng) {
+                  const bcWidth = 240;
+                  const bcHeight = 78;
                   page.drawImage(embeddedPng, {
-                    x: x + (labelWidth - 230) / 2,
+                    x: x + (labelWidth - bcWidth) / 2,
                     y: y + 36,
-                    width: 230,
-                    height: 75,
+                    width: bcWidth,
+                    height: bcHeight,
                   });
                 }
 
+                // 3. Centered Condition
                 if (item.condition) {
+                  const condWidth = helvetica.widthOfTextAtSize(item.condition, 9);
                   page.drawText(item.condition, {
-                    x: x + 16,
+                    x: x + (labelWidth - condWidth) / 2,
                     y: y + 16,
                     size: 9,
                     font: helvetica,
@@ -488,38 +502,46 @@ export default function App() {
         for (const item of labelStream) {
           const page = pdfDoc.addPage([162, 90]);
 
+          // 1. Centered Title
           if (item.title) {
-            const title = item.title.length > 28 ? item.title.slice(0, 28) + "..." : item.title;
+            const title = item.title.length > 30 ? item.title.slice(0, 30) + "..." : item.title;
+            const titleWidth = helveticaBold.widthOfTextAtSize(title, 7.5);
             page.drawText(title, {
-              x: 8,
+              x: Math.max(6, (162 - titleWidth) / 2),
               y: 75,
-              size: 7,
+              size: 7.5,
               font: helveticaBold,
               color: rgb(0, 0, 0),
             });
           }
 
+          // 2. Centered Barcode
           const embeddedPng = barcodeCache[item.sku];
           if (embeddedPng) {
+            const bcWidth = 146;
+            const bcHeight = 52;
             page.drawImage(embeddedPng, {
-              x: 8,
+              x: (162 - bcWidth) / 2,
               y: 18,
-              width: 146,
-              height: 52,
+              width: bcWidth,
+              height: bcHeight,
             });
           }
 
+          // 3. Centered Condition
           if (item.condition) {
+            const condWidth = helvetica.widthOfTextAtSize(item.condition, 6.5);
             page.drawText(item.condition, {
-              x: 8,
-              y: 8,
-              size: 6,
+              x: (162 - condWidth) / 2,
+              y: 7,
+              size: 6.5,
               font: helvetica,
               color: rgb(0.2, 0.2, 0.2),
             });
           }
         }
       }
+
 
       const pdfBytes = await pdfDoc.save();
       const blob = new Blob([pdfBytes], { type: "application/pdf" });
