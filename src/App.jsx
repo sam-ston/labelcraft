@@ -287,6 +287,7 @@ export default function App() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [isGeneratingTestSheet, setIsGeneratingTestSheet] = useState(false);
   const [expandedFaq, setExpandedFaq] = useState(null);
+  const [liveBarcodeUrl, setLiveBarcodeUrl] = useState("");
 
   const barcodeCanvasRef = useRef(null);
   const validation = validateBarcode(barcodeValue, symbology);
@@ -301,12 +302,14 @@ export default function App() {
     }
   }, []);
 
-  // Update route and push to history
-  const handleSelectRoute = (key) => {
+  // Update route, sync supplies, and push to history (preserves user input by default)
+  const handleSelectRoute = (key, preserveInput = true) => {
     setCurrentRoute(key);
     setLayout(PRESETS[key].layout);
-    setBarcodeValue(PRESETS[key].defaultSku);
-    setItemTitle(PRESETS[key].defaultTitle);
+    if (!preserveInput) {
+      setBarcodeValue(PRESETS[key].defaultSku);
+      setItemTitle(PRESETS[key].defaultTitle);
+    }
     if (key === "avery-l7160") {
       setAmazonDomain("co.uk");
     } else {
@@ -318,7 +321,7 @@ export default function App() {
     } catch {}
   };
 
-  // Re-generate live canvas preview
+  // Re-generate live canvas preview & extract clean data URL
   useEffect(() => {
     if (!barcodeValue || !validation.valid || mode === "batch") return;
     try {
@@ -331,6 +334,9 @@ export default function App() {
         margin: 4,
         background: "#ffffff",
       });
+      if (barcodeCanvasRef.current) {
+        setLiveBarcodeUrl(barcodeCanvasRef.current.toDataURL("image/png"));
+      }
     } catch (e) {
       console.warn("JsBarcode preview error:", e);
     }
@@ -1113,14 +1119,14 @@ export default function App() {
                 </label>
                 <div className="grid grid-cols-2 gap-2">
                   {[
-                    { id: "avery5160", name: "Avery 5160", desc: "US Letter • 30-Up" },
-                    { id: "thermal2x1", name: "Thermal Roll", desc: "2.25\" x 1.25\" Continuous" },
-                    { id: "averyl7160", name: "Avery L7160", desc: "A4 European • 21-Up" },
-                    { id: "avery5163", name: "Avery 5163", desc: "Box / Carton • 10-Up" },
+                    { id: "avery5160", route: "avery-5160", name: "Avery 5160", desc: "US Letter • 30-Up" },
+                    { id: "thermal2x1", route: "thermal-2x1", name: "Thermal Roll", desc: "2.25\" x 1.25\" Continuous" },
+                    { id: "averyl7160", route: "avery-l7160", name: "Avery L7160", desc: "A4 European • 21-Up" },
+                    { id: "avery5163", route: "avery-5163-box", name: "Avery 5163", desc: "Box / Carton • 10-Up" },
                   ].map((l) => (
                     <button
                       key={l.id}
-                      onClick={() => setLayout(l.id)}
+                      onClick={() => handleSelectRoute(l.route, true)}
                       className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer ${
                         layout === l.id
                           ? "border-indigo-600 bg-indigo-50/80 text-indigo-900 font-bold ring-1 ring-indigo-500/20"
@@ -1323,13 +1329,19 @@ export default function App() {
 
               {layout === "thermal2x1" && (
                 <div className="border border-slate-300 rounded-xl p-8 bg-slate-100 flex items-center justify-center min-h-[300px]">
-                  <div className="bg-white border border-slate-300 rounded-xl shadow-sm p-4 w-64 h-36 flex flex-col justify-between items-center text-center">
+                  <div className="bg-white border border-slate-300 rounded-xl shadow-md p-4 w-64 h-38 flex flex-col justify-between items-center text-center transition-all">
                     <p className="text-xs font-bold text-slate-900 truncate w-full">{itemTitle || "Product Title"}</p>
-                    <div className="h-14 w-full bg-slate-900 rounded flex items-center justify-center text-white text-xs font-mono tracking-widest">
-                      ||||||||||||||||||||||
+                    <div className="my-1 flex items-center justify-center w-full min-h-[58px]">
+                      {liveBarcodeUrl ? (
+                        <img src={liveBarcodeUrl} alt="Barcode Preview" className="h-14 w-auto max-w-[220px] object-contain" />
+                      ) : (
+                        <div className="h-12 w-4/5 bg-slate-100 rounded flex items-center justify-center text-[10px] text-slate-400 font-mono">
+                          Generating Barcode...
+                        </div>
+                      )}
                     </div>
                     <p className="text-xs font-mono text-slate-700">{barcodeValue}</p>
-                    <p className="text-[10px] text-slate-500">{itemCondition}</p>
+                    <p className="text-[10px] text-slate-500 font-medium">{itemCondition}</p>
                   </div>
                 </div>
               )}
@@ -1484,23 +1496,27 @@ export default function App() {
       </div>
 
       {/* ── FOOTER ───────────────────────────────────────────────────────────── */}
-      <footer className="border-t border-slate-200 bg-white py-8 text-xs text-slate-500">
-        <div className="max-w-6xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <span className="font-extrabold text-slate-900">LabelCraft</span>
-            <span>• Calibrated Barcode Label Sheet Generator</span>
+      <footer className="border-t border-slate-200 bg-white py-6 text-xs text-slate-500 mt-12">
+        <div className="max-w-6xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left">
+          <div className="flex flex-wrap items-center justify-center md:justify-start gap-2">
+            <span className="font-extrabold text-slate-900 tracking-tight">LabelCraft</span>
+            <span className="text-slate-300 hidden sm:inline">•</span>
+            <span className="text-slate-600">Free Calibrated Barcode Label Sheet Generator</span>
           </div>
 
-          <div className="flex items-center gap-4 text-[11px] text-slate-500 flex-wrap justify-center">
+          <div className="flex items-center gap-3 text-[11px] text-slate-500 flex-wrap justify-center">
             {Object.keys(PRESETS).map((key) => (
               <button
                 key={key}
-                onClick={() => handleSelectRoute(key)}
-                className="hover:text-indigo-600 transition-colors cursor-pointer"
+                onClick={() => handleSelectRoute(key, true)}
+                className={`hover:text-indigo-600 transition-colors cursor-pointer ${
+                  currentRoute === key ? "font-bold text-indigo-600" : ""
+                }`}
               >
                 {PRESETS[key].name}
               </button>
             ))}
+            <span className="text-slate-300">•</span>
             <button
               onClick={() => setShowAffiliateModal(true)}
               className="text-slate-400 hover:text-slate-700 transition-colors cursor-pointer flex items-center gap-1"
@@ -1509,8 +1525,8 @@ export default function App() {
             </button>
           </div>
 
-          <div className="text-[10px] text-slate-400 text-center md:text-right">
-            100% Client-Side • Not affiliated with Amazon, Avery, or Munbyn.
+          <div className="text-[10px] text-slate-400">
+            100% Client-Side Privacy • Zero Data Uploads
           </div>
         </div>
       </footer>
