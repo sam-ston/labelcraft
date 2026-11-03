@@ -59,7 +59,7 @@ const PRESETS = {
         rating: 4.6,
         reviews: "3,950+",
         price: "$29.99",
-        asin: "B07T2Q3B7N",
+        asin: "B0855MQ9Y6",
         prime: true,
       },
       {
@@ -71,7 +71,7 @@ const PRESETS = {
         rating: 4.4,
         reviews: "5,120+",
         price: "$99.00",
-        asin: "B09NZB7G7G",
+        asin: "B09J7946RJ",
         prime: true,
       },
     ],
@@ -203,7 +203,7 @@ const PRESETS = {
         rating: 4.6,
         reviews: "3,950+",
         price: "£26.99",
-        asin: "B07T2Q3B7N",
+        asin: "B0855MQ9Y6",
         prime: true,
       },
       {
