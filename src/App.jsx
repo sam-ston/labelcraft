@@ -24,6 +24,9 @@ import {
   Minus,
   CheckCircle2,
   Settings,
+  Barcode,
+  ScanLine,
+  Package,
 } from "lucide-react";
 
 // ─── PROGRAMMATIC PRESETS & MULTI-PRODUCT AFFILIATE CATALOG ────────────────
@@ -837,42 +840,52 @@ export default function App() {
     <div className="min-h-screen bg-slate-50 text-slate-900 font-sans flex flex-col justify-between">
       <div>
         {/* ── TOP NAV BAR ──────────────────────────────────────────────────────── */}
-        <header className="border-b bg-white border-slate-200 sticky top-0 z-30 shadow-2xs">
+        <header className="border-b bg-white border-slate-200/80 sticky top-0 z-30 shadow-2xs backdrop-blur-md bg-white/95">
           <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between gap-2">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-bold shadow-xs">
-                <Printer className="w-5 h-5" />
+              <div className="w-10 h-10 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-center text-emerald-400 shadow-md relative overflow-hidden group">
+                <div className="absolute top-0 inset-x-0 h-0.5 bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-300"></div>
+                <Barcode className="w-5 h-5 text-emerald-400 stroke-[2.2]" />
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="font-extrabold text-lg tracking-tight text-slate-900">LabelCraft</span>
-                  <span className="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-bold border border-emerald-200">
-                    100% Private
+                  <span className="font-black text-xl tracking-tight text-slate-950 flex items-center">
+                    LABEL<span className="text-emerald-500">CRAFT</span>
+                  </span>
+                  <span className="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-800 font-bold border border-emerald-500/30">
+                    LOGISTICS SUITE
                   </span>
                 </div>
+                <p className="text-[10px] text-slate-400 font-medium tracking-tight -mt-0.5 hidden sm:block">
+                  Calibrated FBA & Carrier Label Engine
+                </p>
               </div>
             </div>
 
             {/* Desktop Preset Switcher */}
-            <div className="hidden lg:flex items-center gap-1 bg-slate-100 p-1 rounded-xl text-xs font-medium">
+            <div className="hidden lg:flex items-center gap-1 bg-slate-100/90 border border-slate-200/80 p-1 rounded-xl text-xs font-semibold">
               {Object.keys(PRESETS).map((key) => (
                 <button
                   key={key}
                   onClick={() => handleSelectRoute(key)}
-                  className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+                  className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
                     currentRoute === key
-                      ? "bg-white text-indigo-700 font-bold shadow-xs"
-                      : "text-slate-600 hover:text-slate-900"
+                      ? "bg-slate-950 text-white font-bold shadow-xs"
+                      : "text-slate-600 hover:text-slate-950 hover:bg-slate-200/60"
                   }`}
                 >
+                  {currentRoute === key && (
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                  )}
                   {PRESETS[key].name}
                 </button>
               ))}
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="hidden sm:inline-flex items-center gap-1 text-xs text-slate-500 font-medium bg-slate-100 px-3 py-1.5 rounded-xl">
-                <ShieldCheck className="w-4 h-4 text-emerald-600" /> Client-Side Only
+              <span className="hidden sm:inline-flex items-center gap-1.5 text-xs text-slate-600 font-medium bg-emerald-50/80 border border-emerald-200/70 px-3 py-1.5 rounded-xl shadow-2xs">
+                <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                <span className="font-bold text-slate-800">Zero Cloud Storage</span>
               </span>
             </div>
           </div>
@@ -883,12 +896,15 @@ export default function App() {
               <button
                 key={key}
                 onClick={() => handleSelectRoute(key)}
-                className={`px-3 py-1.5 rounded-lg text-xs whitespace-nowrap font-medium transition-all cursor-pointer shrink-0 ${
+                className={`px-3 py-1.5 rounded-lg text-xs whitespace-nowrap font-medium transition-all cursor-pointer shrink-0 flex items-center gap-1.5 ${
                   currentRoute === key
-                    ? "bg-indigo-600 text-white font-bold shadow-xs"
+                    ? "bg-slate-950 text-white font-bold shadow-xs"
                     : "bg-white border border-slate-200 text-slate-700"
                 }`}
               >
+                {currentRoute === key && (
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                )}
                 {PRESETS[key].name}
               </button>
             ))}
@@ -906,8 +922,8 @@ export default function App() {
                   onClick={() => setMode("single")}
                   className={`flex-1 py-2 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
                     mode === "single"
-                      ? "bg-white text-indigo-700 shadow-xs"
-                      : "text-slate-600 hover:text-slate-900"
+                      ? "bg-slate-950 text-white font-bold shadow-xs"
+                      : "text-slate-600 hover:text-slate-950"
                   }`}
                 >
                   Single SKU
@@ -916,8 +932,8 @@ export default function App() {
                   onClick={() => setMode("batch")}
                   className={`flex-1 py-2 text-xs font-semibold rounded-lg flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
                     mode === "batch"
-                      ? "bg-white text-indigo-700 shadow-xs"
-                      : "text-slate-600 hover:text-slate-900"
+                      ? "bg-slate-950 text-white font-bold shadow-xs"
+                      : "text-slate-600 hover:text-slate-950"
                   }`}
                 >
                   <FileSpreadsheet className="w-3.5 h-3.5" />
@@ -937,10 +953,10 @@ export default function App() {
                         <button
                           key={sym}
                           onClick={() => setSymbology(sym)}
-                          className={`py-1.5 text-xs font-medium rounded-lg border transition-all cursor-pointer ${
+                          className={`py-2 text-xs font-semibold rounded-lg border transition-all cursor-pointer ${
                             symbology === sym
-                              ? "bg-indigo-50 border-indigo-600 text-indigo-700 font-bold"
-                              : "border-slate-200 text-slate-600 hover:bg-slate-50"
+                              ? "bg-slate-950 border-slate-900 text-white font-bold shadow-xs"
+                              : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50 hover:border-slate-300"
                           }`}
                         >
                           {sym === "CODE128" ? "FNSKU / 128" : sym === "UPC" ? "UPC-A" : "EAN-13"}
@@ -1114,46 +1130,56 @@ export default function App() {
 
               {/* Format Selection Selector */}
               <div className="pt-2 border-t border-slate-100">
-                <label className="text-xs font-semibold text-slate-600 uppercase tracking-wider block mb-2">
-                  Destination Sheet Format
-                </label>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
+                    Destination Sheet Format
+                  </label>
+                  <span className="text-[10px] text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200/80">
+                    Auto-Calibrated
+                  </span>
+                </div>
+                <div className="grid grid-cols-2 gap-2.5">
                   {[
                     { id: "avery5160", route: "avery-5160", name: "Avery 5160", desc: "US Letter • 30-Up" },
-                    { id: "thermal2x1", route: "thermal-2x1", name: "Thermal Roll", desc: "2.25\" x 1.25\" Continuous" },
+                    { id: "thermal2x1", route: "thermal-2x1", name: "Thermal Roll", desc: "2.25\" x 1.25\" Roll" },
                     { id: "averyl7160", route: "avery-l7160", name: "Avery L7160", desc: "A4 European • 21-Up" },
                     { id: "avery5163", route: "avery-5163-box", name: "Avery 5163", desc: "Box / Carton • 10-Up" },
                   ].map((l) => (
                     <button
                       key={l.id}
                       onClick={() => handleSelectRoute(l.route, true)}
-                      className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer ${
+                      className={`p-3 rounded-xl border text-left transition-all cursor-pointer relative ${
                         layout === l.id
-                          ? "border-indigo-600 bg-indigo-50/80 text-indigo-900 font-bold ring-1 ring-indigo-500/20"
-                          : "border-slate-200 text-slate-600 hover:bg-slate-50"
+                          ? "border-emerald-600 bg-emerald-50/70 text-slate-900 font-bold ring-2 ring-emerald-500/20 shadow-xs"
+                          : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50/80"
                       }`}
                     >
-                      <p className="text-xs">{l.name}</p>
-                      <p className="text-[10px] text-slate-500 font-normal">{l.desc}</p>
+                      <div className="flex items-center justify-between mb-0.5">
+                        <p className="text-xs font-bold text-slate-900">{l.name}</p>
+                        {layout === l.id ? (
+                          <span className="w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-emerald-200"></span>
+                        ) : null}
+                      </div>
+                      <p className="text-[10px] text-slate-500 font-medium">{l.desc}</p>
                     </button>
                   ))}
                 </div>
               </div>
 
               {/* Action Buttons: Download PDF & Zero-Ink Test Sheet */}
-              <div className="space-y-2 pt-1">
+              <div className="space-y-2.5 pt-2">
                 <button
                   onClick={handleGeneratePdf}
                   disabled={isGenerating || (mode === "single" ? !validation.valid : batchItems.length === 0)}
-                  className="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white font-bold text-sm rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
+                  className="w-full py-4 bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-600 hover:from-emerald-500 hover:via-emerald-400 hover:to-teal-500 active:scale-[0.99] disabled:opacity-50 text-white font-black text-sm tracking-wider uppercase rounded-xl shadow-lg shadow-emerald-600/20 hover:shadow-emerald-600/30 border border-emerald-400/40 transition-all flex items-center justify-center gap-2.5 cursor-pointer"
                 >
                   {isGenerating ? (
                     <>
-                      <RefreshCw className="w-4 h-4 animate-spin" /> Rendering PDF...
+                      <RefreshCw className="w-4 h-4 animate-spin text-white" /> Rendering PDF Engine...
                     </>
                   ) : (
                     <>
-                      <Download className="w-4 h-4" /> Download Print-Ready PDF
+                      <Download className="w-4 h-4 text-white stroke-[2.5]" /> Download Print-Ready PDF
                     </>
                   )}
                 </button>
@@ -1162,7 +1188,7 @@ export default function App() {
                   <button
                     onClick={handleGenerateTestSheet}
                     disabled={isGeneratingTestSheet}
-                    className="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                    className="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer border border-slate-200/80"
                   >
                     <FileText className="w-3.5 h-3.5 text-slate-500" />
                     Download Alignment Test Sheet (Zero Ink)
@@ -1499,9 +1525,11 @@ export default function App() {
       <footer className="border-t border-slate-200 bg-white py-6 text-xs text-slate-500 mt-12">
         <div className="max-w-6xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left">
           <div className="flex flex-wrap items-center justify-center md:justify-start gap-2">
-            <span className="font-extrabold text-slate-900 tracking-tight">LabelCraft</span>
+            <span className="font-black text-slate-950 tracking-tight">
+              LABEL<span className="text-emerald-500">CRAFT</span>
+            </span>
             <span className="text-slate-300 hidden sm:inline">•</span>
-            <span className="text-slate-600">Free Calibrated Barcode Label Sheet Generator</span>
+            <span className="text-slate-600 font-medium">Calibrated Barcode & FBA Compliance Engine</span>
           </div>
 
           <div className="flex items-center gap-3 text-[11px] text-slate-500 flex-wrap justify-center">
@@ -1509,8 +1537,8 @@ export default function App() {
               <button
                 key={key}
                 onClick={() => handleSelectRoute(key, true)}
-                className={`hover:text-indigo-600 transition-colors cursor-pointer ${
-                  currentRoute === key ? "font-bold text-indigo-600" : ""
+                className={`hover:text-emerald-600 transition-colors cursor-pointer ${
+                  currentRoute === key ? "font-bold text-emerald-600" : ""
                 }`}
               >
                 {PRESETS[key].name}
